@@ -1,0 +1,9 @@
+{
+  "name": "kin-carta-react-native-programming-challenge",
+  "description": "Kin + Carta React Native Programming Challenge",
+  "authors": "Alesei Narkevitch <alesei.n@bzik.net>",
+  "version": "1.0.0",
+  "main": "pathToMain",
+  "dependencies": {},
+  "private": "true"
+}
