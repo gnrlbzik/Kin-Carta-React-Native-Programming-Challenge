@@ -1,39 +1,22 @@
 import React from 'react';
 
-import type {
-  ContactsList as ContactsListType,
-  ContactItem as ContactItemType,
-} from '../types';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {StyleSheet, View, ScrollView} from 'react-native';
 
-import {sortByNameAscending, groupBy, isThisLastRow, t} from '../utils';
+import type {ContactItem as ContactItemType} from '../types';
+
+import {getGroupedAndSortedContactsList} from '../store/selectors';
+
+import {isThisLastRow, t} from '../utils';
+
+import {STORE_CONTACT_PREVIEW_SET} from '../constants';
 
 import {ContactsListItem, ContactsListHeading} from './index';
 
-import type {ContactItem} from '../types';
-
-type Props = {
-  contacts: ContactsListType;
-  toggleContactDetails: (contactDetails: ContactItem) => void;
-};
-
-function ContactsList(props: Props) {
-  const {contacts, toggleContactDetails} = props;
-  // README: as I chose not to hook up store and actions atm, this will live here for now.
-  // FIXME: should be moved into store/actions/side-effects
-  const contactsGroupedByIsFavoriteProp = groupBy(contacts, 'isFavorite');
-  const {
-    true: favoriteContacts,
-    false: otherContacts,
-  } = contactsGroupedByIsFavoriteProp;
-
-  const sortedFavoriteContacts =
-    (favoriteContacts.length && favoriteContacts.sort(sortByNameAscending)) ||
-    favoriteContacts;
-  const sortedOtherContacts =
-    (otherContacts.length && otherContacts.sort(sortByNameAscending)) ||
-    otherContacts;
+function ContactsList() {
+  const dispatch = useDispatch();
+  const {favorites, others} = useSelector(getGroupedAndSortedContactsList);
 
   return (
     <ScrollView
@@ -41,28 +24,32 @@ function ContactsList(props: Props) {
       style={styles.scrollView}>
       <View style={styles.view}>
         <ContactsListHeading text={t('contactsListHeadings.favorite')} />
-        {sortedFavoriteContacts.map(
-          (contact: ContactItemType, index: number) => (
-            <ContactsListItem
-              key={contact.name + index}
-              contact={contact}
-              onTouchHandler={(returnedContactData: ContactItemType) => {
-                toggleContactDetails(returnedContactData);
-              }}
-              isLastRow={isThisLastRow(index, sortedFavoriteContacts.length)}
-            />
-          ),
-        )}
-
-        <ContactsListHeading text={t('contactsListHeadings.other')} />
-        {sortedOtherContacts.map((contact: ContactItemType, index: number) => (
+        {favorites.map((contact: ContactItemType, index: number) => (
           <ContactsListItem
             key={contact.name + index}
             contact={contact}
             onTouchHandler={(returnedContactData: ContactItemType) => {
-              toggleContactDetails(returnedContactData);
+              dispatch({
+                type: STORE_CONTACT_PREVIEW_SET,
+                payload: returnedContactData.id,
+              });
             }}
-            isLastRow={isThisLastRow(index, sortedOtherContacts.length)}
+            isLastRow={isThisLastRow(index, favorites.length)}
+          />
+        ))}
+
+        <ContactsListHeading text={t('contactsListHeadings.other')} />
+        {others.map((contact: ContactItemType, index: number) => (
+          <ContactsListItem
+            key={contact.name + index}
+            contact={contact}
+            onTouchHandler={(returnedContactData: ContactItemType) => {
+              dispatch({
+                type: STORE_CONTACT_PREVIEW_SET,
+                payload: returnedContactData.id,
+              });
+            }}
+            isLastRow={isThisLastRow(index, others.length)}
           />
         ))}
       </View>

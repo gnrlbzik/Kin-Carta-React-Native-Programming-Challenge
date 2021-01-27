@@ -8,7 +8,15 @@ import {
   ScrollView,
 } from 'react-native';
 
-import {THUMB_SIZE_PREVIEW} from '../constants';
+import {useDispatch, useSelector} from 'react-redux';
+
+import {getContactPreviewDetails} from '../store/selectors';
+
+import {
+  THUMB_SIZE_PREVIEW,
+  STORE_CONTACT_PREVIEW_UNSET,
+  STORE_CONTACTS_TOGGLE_IS_FAVORITE,
+} from '../constants';
 
 import {Colors} from '../theme';
 
@@ -18,13 +26,10 @@ import {t} from '../utils';
 
 import {Thumbnail, Header, ContactPreviewSection} from './index';
 
-type Props = {
-  contactDetails: ContactItem;
-  toggleContactDetails: () => void;
-};
+function ContactPreview() {
+  const dispatch = useDispatch();
+  const contactDetails = useSelector(getContactPreviewDetails);
 
-function ContactPreview(props: Props) {
-  const {contactDetails, toggleContactDetails} = props;
   const {
     name,
     largeImageURL,
@@ -34,7 +39,9 @@ function ContactPreview(props: Props) {
     birthdate,
     emailAddress,
     isFavorite,
+    id,
   } = contactDetails;
+
   const sectionsToDisplay = [
     homePhone && {
       heading: t('contactDetail.headings.phone'),
@@ -87,13 +94,14 @@ function ContactPreview(props: Props) {
   return (
     <View style={styles.view}>
       <Header style={styles.inlineText}>
-        <TouchableOpacity onPress={() => toggleContactDetails()}>
+        <TouchableOpacity
+          onPress={() => dispatch({type: STORE_CONTACT_PREVIEW_UNSET})}>
           <Text style={styles.link}>＜ Contacts</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => {
-            console.log('contact to be starred');
-          }}>
+          onPress={() =>
+            dispatch({type: STORE_CONTACTS_TOGGLE_IS_FAVORITE, payload: id})
+          }>
           <Text style={styles.star}>{isFavorite ? `★` : `☆`}</Text>
         </TouchableOpacity>
       </Header>
@@ -105,7 +113,7 @@ function ContactPreview(props: Props) {
           <Text style={styles.companyName}>{companyName}</Text>
         </View>
         {sectionsToDisplay.map((section, index) => (
-          <ContactPreviewSection key={index} sectionDetails={section} />
+          <ContactPreviewSection uniqueKey={index} sectionDetails={section} />
         ))}
       </ScrollView>
     </View>

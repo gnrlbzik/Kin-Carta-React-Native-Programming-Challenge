@@ -5,6 +5,7 @@ import {StyleSheet, View, Text} from 'react-native';
 import {Colors} from '../theme';
 
 type Props = {
+  uniqueKey: number;
   sectionDetails: {
     heading: string;
     data: {
@@ -23,7 +24,7 @@ function ContactPreviewSection(props: Props) {
   const textRowsDigest = Array.isArray(text) ? [...text] : [text];
 
   return (
-    <View style={styles.view}>
+    <View style={styles.view} key={props.uniqueKey}>
       <Text style={styles.sectionHeading}>{heading}:</Text>
       <View style={styles.inlineText}>
         <View>

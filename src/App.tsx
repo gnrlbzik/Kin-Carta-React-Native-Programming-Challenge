@@ -1,42 +1,47 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
-import {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {SafeAreaView, StatusBar, StyleSheet, View} from 'react-native';
 
-import {LOADING_INDICATOR_DURATION} from './constants';
+import {
+  STORE_CONTACTS_INITIATED_FETCHING,
+  STORE_CONTACTS_COMPLETED_FETCHING,
+  LOADING_INDICATOR_DURATION,
+} from './constants';
+
 import {t} from './utils';
+
+import {
+  getContactsList,
+  areContactsLoading,
+  getContactPreviewId,
+} from './store/selectors';
 
 import {ContactsList, ContactPreview, Header, LoadingData} from './components';
 
 import {getContacts} from './fetchData';
 
-import type {ContactItem} from './types';
-
 function App() {
-  const [contacts, setContacts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [contactDetailsToView, setContactDetailsToView] = useState(null);
+  const dispatch = useDispatch();
+  const contactsList = useSelector(getContactsList);
+  const isLoading = useSelector(areContactsLoading);
+  const contactPreviewId = useSelector(getContactPreviewId);
 
   useEffect(() => {
-    (async () => {
-      // README: as I chose not to hook up store and actions atm, this will live here for now.
-      // FIXME: should be moved into store/actions/side-effects
-      const getContactsResponse = await getContacts();
-      setContacts(getContactsResponse);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, LOADING_INDICATOR_DURATION);
-    })();
-  }, [contacts.length]);
-
-  const toggleContactDetails = (contactInfo: ContactItem) => {
-    if (contactInfo) {
-      setContactDetailsToView(contactInfo);
-    } else {
-      setContactDetailsToView(null);
+    if (contactsList.length === 0) {
+      dispatch({type: STORE_CONTACTS_INITIATED_FETCHING});
+      (async () => {
+        const getContactsResponse = await getContacts();
+        setTimeout(() => {
+          dispatch({
+            type: STORE_CONTACTS_COMPLETED_FETCHING,
+            payload: getContactsResponse,
+          });
+        }, LOADING_INDICATOR_DURATION);
+      })();
     }
-  };
+  }, [contactsList, dispatch]);
 
   return (
     <>
@@ -48,18 +53,10 @@ function App() {
           ) : (
             <>
               <Header text={t('contactsListHeaderText')} />
-              <ContactsList
-                contacts={contacts}
-                toggleContactDetails={toggleContactDetails}
-              />
+              <ContactsList />
             </>
           )}
-          {contactDetailsToView ? (
-            <ContactPreview
-              contactDetails={contactDetailsToView}
-              toggleContactDetails={toggleContactDetails}
-            />
-          ) : null}
+          {contactPreviewId ? <ContactPreview /> : null}
         </View>
       </SafeAreaView>
     </>
