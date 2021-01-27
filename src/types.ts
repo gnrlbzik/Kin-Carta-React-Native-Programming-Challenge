@@ -1,3 +1,8 @@
+export type Action = {
+  payload: Array<ContactItem>;
+  type: string;
+};
+
 export type ContactItem = {
   name: string;
   id: string;
@@ -22,3 +27,11 @@ export type ContactItem = {
 };
 
 export type ContactsList = Array<ContactItem>;
+
+export type State = {
+  contacts: {
+    isLoading: boolean;
+    list: ContactsList;
+  };
+  contactPreviewId: string | null;
+};

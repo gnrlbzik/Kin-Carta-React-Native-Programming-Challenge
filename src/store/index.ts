@@ -1,7 +1,10 @@
 import {createStore, combineReducers} from 'redux';
-import contactsList from './reducers/contactsList';
+import {
+  contactsListReducer as contacts,
+  contactPreviewIdReducer as contactPreviewId,
+} from './reducers';
 
-const rootReducer = combineReducers({contactsList});
+const rootReducer = combineReducers({contacts, contactPreviewId});
 
 const configureStore = () => createStore(rootReducer);
 
