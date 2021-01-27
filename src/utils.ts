@@ -21,5 +21,5 @@ export const groupBy = (array: Array<any>, byPropertyName: string) =>
   }, {});
 
 export const isThisLastRow = (index: number, length: number) => {
-  return index === length - 1;
+  return index === length;
 };

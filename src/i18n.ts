@@ -4,7 +4,7 @@ export const t = (translationPath: string) => {
   try {
     return translationPath
       .split('.')
-      .reduce((p: any, c: any) => (p && p[c]) || null, i18n[locale]); // FIXME: types
+      .reduce((p: any, c: any) => (p && p[c]) || `${i18n.appErrors[locale].noTranslationFound}`, i18n[locale]); // FIXME: types
   } catch (error) {
     return `${i18n.appErrors[locale].noTranslationFound}`;
   }

@@ -34,7 +34,7 @@ function ContactsList() {
                 payload: returnedContactData.id,
               });
             }}
-            isLastRow={isThisLastRow(index, favorites.length)}
+            isLastRow={isThisLastRow(index + 1, favorites.length)}
           />
         ))}
 
@@ -49,7 +49,7 @@ function ContactsList() {
                 payload: returnedContactData.id,
               });
             }}
-            isLastRow={isThisLastRow(index, others.length)}
+            isLastRow={isThisLastRow(index + 1, others.length)}
           />
         ))}
       </View>
